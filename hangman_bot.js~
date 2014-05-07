@@ -47,5 +47,28 @@ bot.addListener("message", function(from, to, text, message) {
 
 bot.addListener("message", function(from, to, text, message) {
 	if (text.toLowerCase().substring(0, 6) == '.guess') {
+		var letter = text[7];
+		console.log(letter);
+		if (lettersTried.indexOf(letter) > -1) {
+			bot.say(config.channels[0], "This letter has already been guessed.");
+		} else {
+			if (word.indexOf(letter) > -1) {
+				for (var i = 0; i < word.length; i++) {
+					if (word[i] == letter) {
+						console.log(i);
+						setCharAt(completedWord, i, letter);
+					}
+				}
+				bot.say(config.channels[0], completedWord);
+			} else {
+				bot.say(config.channels[0], "WROOOOOOOONNNNNG!!");
+			}
+			lettersTried.push(letter);
+		}
+	}
+});
 
+function setCharAt(str,index,chr) {
+	if(index > str.length-1) return str;
+	return str.substr(0,index) + chr + str.substr(index+1);
 }

@@ -37,7 +37,7 @@ var chooseWord = function() {
 		drawHangman();
 
 		bot.say(config.channels[0], completedWord.split('').join(' '));
-		word = lines[index];
+		word = lines[index].toLowerCase();
 
 		game = true;
 		lettersTried = [];
@@ -76,7 +76,7 @@ var wrongGuess = function() {
 	manState++;
 	drawHangman();
 	if (manState == 6) {
-		bot.say(config.channels[0], "You lose!");
+		bot.say(config.channels[0], "You lose! The word was " + word);
 		game = false;
 	} else {
 		bot.say(config.channels[0], "WROOOOOOOONNNNNG!!");
@@ -92,41 +92,69 @@ bot.addListener("message", function(from, to, text, message) {
 
 bot.addListener("message", function(from, to, text, message) {
 	if (text.toLowerCase().substring(0, 7) == '.guess ') {
-		var letter = text[7];
-		console.log(letter);
-		if (lettersTried.indexOf(letter) > -1) {
-			bot.say(config.channels[0], "This letter has already been guessed.");
-		} else {
-			if (word.indexOf(letter) > -1) {
-				for (var i = 0; i < word.length; i++) {
-					if (word[i] == letter) {
-						console.log(i);
-						completedWord = setCharAt(completedWord, i, letter);
-					}
-				}
-				if (completedWord == word) {
-					bot.say(config.channels[0], "You win! The word is " + word);
-					game = false;	
-				} else {
-					bot.say(config.channels[0], completedWord);
-				}
+		if (game) {
+			var letter = text[7];
+			console.log(letter);
+			if (lettersTried.indexOf(letter) > -1) {
+				bot.say(config.channels[0], "This letter has already been guessed.");
 			} else {
-				wrongGuess();
+				if (word.indexOf(letter) > -1) {
+					for (var i = 0; i < word.length; i++) {
+						if (word[i] == letter) {
+							console.log(i);
+							completedWord = setCharAt(completedWord, i, letter);
+						}
+					}
+					if (completedWord == word) {
+						bot.say(config.channels[0], "You win! The word is " + word);
+						game = false;	
+					} else {
+						bot.say(config.channels[0], completedWord.split('').join(' '));
+					}
+				} else {
+					wrongGuess();
+				}
+				lettersTried.push(letter);
 			}
-			lettersTried.push(letter);
+		}
+		else  {
+			bot.say(config.channels[0], "There is no currently active game");
 		}
 	}
 });
 
 bot.addListener("message", function(from, to, text, message) {
 	if (text.toLowerCase().substring(0, 10) == ".guessword") {
-		var guess = text.substring(11);
-		if (guess == word) {
-			bot.say(config.channels[0], "You win! The word is " + word);
-			game = false;
+		if (game) {
+			var guess = text.substring(11);
+			if (guess == word) {
+				bot.say(config.channels[0], "You win! The word is " + word);
+				game = false;
+			} else {
+				wrongGuess();
+			}
 		} else {
-			wrongGuess();
+			bot.say(config.channels[0], "There is no currently active game");
 		}
+	}
+});
+
+bot.addListener("message", function(from, to, text, message) {
+	if (text.toLowerCase().substring(0, 8) == ".letters") {
+		var letterPool = "abcdefghijklmnopqrstuvwxyz";
+		for (var i = 0; i < lettersTried.length; i++) {
+			if (letterPool.indexOf(lettersTried[i]) > -1) {
+				letterPool = setCharAt(letterPool, letterPool.indexOf(lettersTried[i]), '_');
+			}
+		}
+		bot.say(config.channels[0], letterPool);
+	}
+});
+
+bot.addListener("message", function(from, to, text, message) {
+	if (text.toLowerCase().substring(0, 7) == ".status") {
+		drawHangman();
+		bot.say(config.channels[0], completedWord.split('').join(' '));
 	}
 });
 

@@ -103,7 +103,9 @@ bot.addListener("message", function(from, to, text, message) {
 			console.log(letter);
 			if (lettersTried[to].indexOf(letter) > -1) {
 				bot.say(to, "This letter has already been guessed.");
-			} else {
+      } else if (!letter.match(/[a-z]/)) {
+        bot.say(to, "That is not a valid character");
+      } else {
 				if (word[to].indexOf(letter) > -1) {
 					for (var i = 0; i < word[to].length; i++) {
 						if (word[to][i] == letter) {

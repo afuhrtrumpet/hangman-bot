@@ -4,7 +4,7 @@ var fs = require('fs');
 var file = process.argv[2];
 
 var config = {
-channels: ["#osuosc-hangman", " #bayareainterns"],
+channels: ["#osuosc-hangman", " #cwdg", "#hangman"],
 					server: "irc.freenode.net",
 					botName: "Hangman-Botman"
 };
@@ -96,11 +96,9 @@ bot.addListener("message", function(from, to, text, message) {
 });
 
 bot.addListener("message", function(from, to, text, message) {
-	console.log(to);
 	if (text.toLowerCase().substring(0, 7) == '.guess ') {
 		if (game[to]) {
 			var letter = text[7];
-			console.log(letter);
 			if (lettersTried[to].indexOf(letter) > -1) {
 				bot.say(to, "This letter has already been guessed.");
 			} else {

@@ -101,6 +101,8 @@ bot.addListener("message", function(from, to, text, message) {
 			var letter = text[7];
 			if (lettersTried[to].indexOf(letter) > -1) {
 				bot.say(to, "This letter has already been guessed.");
+			} else if (!letter.match(/[a-z]/)) {
+				bot.say(to, "That is not a valid character");
 			} else {
 				if (word[to].indexOf(letter) > -1) {
 					for (var i = 0; i < word[to].length; i++) {

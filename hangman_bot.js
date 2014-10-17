@@ -1,6 +1,8 @@
 var irc = require('irc');
 var fs = require('fs');
 
+var wordRegex = /^[a-zA-Z ]+$/ 
+
 var file = process.argv[2];
 
 var config = {
@@ -40,9 +42,9 @@ var chooseWord = function(channel) {
 	});
 };
 
-var setWord = function(channel, word) {
+var setWord = function(channel, text) {
 	completedWord[channel] = "";
-	var words = word.split(' ');
+	var words = text.split(' ');
 	for (var i = 0; i < words.length; i++) {
 		completedWord[channel] += new Array(words[i].length + 1).join('_');
 		if (i < words.length - 1) {
@@ -53,7 +55,7 @@ var setWord = function(channel, word) {
 	drawHangman(channel);
 
 	bot.say(channel, completedWord[channel].split('').join(' '));
-	word[channel] = word.toLowerCase();
+	word[channel] = text.toLowerCase();
 
 	game[channel] = true;
 	lettersTried[channel] = [];
@@ -97,10 +99,10 @@ var wrongGuess = function(channel) {
 bot.addListener("message#", function(from, to, text, message) {
 	if (text.toLowerCase().substring(0, 14) == '.start hangman') {
 		if (!game[to]) {
-			if (text.length < 16 || text.charAt(15) != '0' && text.charAt(15) != '1') {
+			if (text.length < 16 || (text.charAt(15) != '0' && text.charAt(15) != '1')) {
 				bot.say(to, "Please choose a game type! Either .start hangman 0 or .start hangman 1.");
 			} else {
-				if (text.charAt[15] == '0') chooseWord(to);
+				if (text.charAt(15) == '0') chooseWord(to);
 				else {
 					bot.say(to, from + ": please message me with a word.");
 					waitingForUser[to] = from;
@@ -117,8 +119,12 @@ bot.addListener("pm", function(nick, text, message) {
 	var channel;
 	for (channel in waitingForUser) {
 		if (nick == waitingForUser[channel]) {
-			setWord(channel, text);
-			waitingForUser[channel] = "";
+			if (text.match(wordRegex)) {
+				setWord(channel, text);
+				waitingForUser[channel] = "";
+			} else {
+				bot.say(nick, "Invalid word! Words can only have alphabetic characters and spaces.");
+			}
 		}
 	}
 });
@@ -135,17 +141,13 @@ bot.addListener("message#", function(from, to, text, message) {
 				if (word[to].indexOf(letter) > -1) {
 					for (var i = 0; i < word[to].length; i++) {
 						if (word[to][i] == letter) {
-							console.log(i);
-							console.log(completedWord[to]);
 							completedWord[to] = setCharAt(completedWord[to], i, letter);
-							console.log(completedWord[to]);
 						}
 					}
 					if (completedWord[to] == word[to]) {
 						bot.say(to, "You win! The word is " + word[to]);
 						game[to] = false;	
 					} else {
-						console.log(completedWord[to]);
 						bot.say(to, completedWord[to].split('').join(' '));
 					}
 				} else {

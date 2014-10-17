@@ -16,10 +16,16 @@ node hangman-bot.js [DICTIONARY FILE NAME]
 
 Commands
 ===========
-* Start game
+* Start game (bot chooses word)
 
 ```
-.start hangman
+.start hangman 0
+```
+
+* Start game (user must message bot word)
+
+```
+.start hangman 1
 ```
 
 * Guess a letter

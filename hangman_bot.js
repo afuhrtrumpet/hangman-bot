@@ -6,9 +6,9 @@ var wordRegex = /^[a-zA-Z ]+$/
 var file = process.argv[2];
 
 var config = {
-channels: ["#osuosc-hangman-testing"],
+channels: ["#osuosc-hangman", "cwdg"],
 					server: "irc.freenode.net",
-					botName: "Crashdummyman"
+					botName: "Hangman-Botman"
 };
 
 var bot = new irc.Client(config.server, config.botName, {
